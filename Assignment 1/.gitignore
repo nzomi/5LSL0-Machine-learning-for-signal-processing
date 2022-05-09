@@ -5,3 +5,4 @@ token.*
 *.html
 *.exe
 Datasets/
+plot/
