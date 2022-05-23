@@ -17,8 +17,8 @@ torch.random.manual_seed(0)
 # define parameters
 data_loc = '5LSL0-Datasets' #change the data location to something that works for you
 batch_size = 64
-no_epochs = 30
-learning_rate = 1e-4
+no_epochs = 50
+learning_rate = 1e-3
 
 # get dataloader
 train_loader, test_loader = MNIST_dataloader.create_dataloaders(data_loc, batch_size)
@@ -78,6 +78,10 @@ for i in range(10):
 plt.tight_layout()
 #plt.savefig("exercise_1.png",dpi=300,bbox_inches='tight')
 plt.show() 
+
+#%%
+
+plt.plot(train_loss)
 
 # %% HINT
 # #hint: if you do not care about going over the data in mini-batches but rather want the entire dataset use:

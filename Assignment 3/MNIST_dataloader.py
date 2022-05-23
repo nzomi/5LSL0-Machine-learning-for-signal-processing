@@ -61,15 +61,18 @@ def create_dataloaders(data_loc, batch_size):
     Noisy_MNIST_train = Noisy_MNIST("train", data_loc)
     Noisy_MNIST_test  = Noisy_MNIST("test" , data_loc)
     
-    Noisy_MNIST_train_loader =  DataLoader(Noisy_MNIST_train, batch_size=batch_size, shuffle=True,  drop_last=False)
+    train_db, val_db = torch.utils.data.random_split(Noisy_MNIST_train, [50000,10000])
+
+    Noisy_MNIST_train_loader =  DataLoader(train_db, batch_size=batch_size, shuffle=True,  drop_last=False)
+    Noisy_MNIST_val_loader =  DataLoader(val_db, batch_size=batch_size, shuffle=True,  drop_last=False)
     Noisy_MNIST_test_loader  =  DataLoader(Noisy_MNIST_test , batch_size=batch_size, shuffle=False, drop_last=False)
     
-    return Noisy_MNIST_train_loader, Noisy_MNIST_test_loader
+    return Noisy_MNIST_train_loader, Noisy_MNIST_val_loader, Noisy_MNIST_test_loader
 
 # %% test if the dataloaders work
 if __name__ == "__main__":
     # define parameters
-    data_loc = 'D://5LSL0-Datasets' #change the datalocation to something that works for you
+    data_loc = '5LSL0-Datasets' #change the datalocation to something that works for you
     batch_size = 64
     
     # get dataloader
@@ -96,3 +99,4 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig("data_examples.png",dpi=300,bbox_inches='tight')
     plt.show()
+# %%
