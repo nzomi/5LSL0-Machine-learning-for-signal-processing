@@ -22,7 +22,6 @@ class Encoder(nn.Module):
         self.conv_last = nn.Sequential(
             nn.Conv2d(16,1,2,padding=(2,1),bias=True),
             nn.BatchNorm2d(1),
-            nn.ReLU(),
             nn.MaxPool2d(2)
         )
         
