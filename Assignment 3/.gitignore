@@ -1,4 +1,4 @@
-__pycache__/
-trained_model/*
-5LSL0-Datasets/
+__pycache__
+trained_model
+5LSL0-Datasets
 test_idx.tar
