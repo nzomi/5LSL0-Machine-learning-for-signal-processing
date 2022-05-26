@@ -22,6 +22,7 @@ class Encoder(nn.Module):
         self.conv_last = nn.Sequential(
             nn.Conv2d(16,1,2,padding=(2,1),bias=True),
             nn.BatchNorm2d(1),
+            nn.ReLU(),
             nn.MaxPool2d(2)
         )
         
@@ -81,19 +82,53 @@ class AE(nn.Module):
         return h,r
         
 #%%
+class Classifier(nn.Module):
+    def __init__(self):
+        super(Classifier,self).__init__()
+        # create layers here
+        self.conv_first = nn.Sequential(
+            nn.Conv2d(1,16,3,padding=1,bias=True),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        self.conv = nn.Sequential(
+            nn.Conv2d(16,16,3,padding=1,bias=True),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        self.flatten = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(2*2*16,10),
+            nn.LogSoftmax(dim=1)
+        )
+        
+    def forward(self, x):
+        # use the created layers here
+        # x --> 32,32,1
+        x = self.conv_first(x) # 16,16,16
+        x = self.conv(x) # 8,8,16
+        x = self.conv(x) # 4,4,16
+        x = self.conv(x) # 2,2,16
+        h = self.flatten(x) # 64 --> 10
+        return h
+#%%
 def sanity_check():
 
     x = torch.randn((64,1,32,32))
 
-    model_1, model_2, model = Encoder(), Decoder(), AE()
+    model_1, model_2, model_3, model_4 = Encoder(), Decoder(), AE(), Classifier()
 
     latent = model_1(x)
     out = model_2(latent)
-    y1, y2 = model(x)
+    y1, y2 = model_3(x)
+    y3 = model_4(x)
     print('Encoder',latent.shape) # should be 64,16,2,1
     print('Decoder',out.shape) # should be 64,1,32,32
     print('AE_latent',y1.shape) # should be 64,16,2,1
     print('AE_output',y2.shape) # should be 64,1,32,32
+    print('Classifier_output',y3.shape) # should be 64,10
 
 # %%
 if __name__ == "__main__":

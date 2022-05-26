@@ -31,6 +31,7 @@ class Noisy_MNIST(Dataset):
             data = Clean_MNIST.data.unsqueeze(1)
             idx = torch.load('test_idx.tar')
             data[:,:] = data[idx,:]
+            Clean_MNIST.targets[:] = Clean_MNIST.targets[idx]
             
         
         # reshape and normalize
@@ -61,13 +62,15 @@ def create_dataloaders(data_loc, batch_size):
     Noisy_MNIST_train = Noisy_MNIST("train", data_loc)
     Noisy_MNIST_test  = Noisy_MNIST("test" , data_loc)
     
-    train_db, val_db = torch.utils.data.random_split(Noisy_MNIST_train, [50000,10000])
+    # train_db, val_db = torch.utils.data.random_split(Noisy_MNIST_train, [50000,10000])
 
-    Noisy_MNIST_train_loader =  DataLoader(train_db, batch_size=batch_size, shuffle=True,  drop_last=False)
-    Noisy_MNIST_val_loader =  DataLoader(val_db, batch_size=batch_size, shuffle=True,  drop_last=False)
+    Noisy_MNIST_train_loader =  DataLoader(Noisy_MNIST_train, batch_size=batch_size, shuffle=True,  drop_last=False)
+    # Noisy_MNIST_train_loader =  DataLoader(train_db, batch_size=batch_size, shuffle=True,  drop_last=False)
+    # Noisy_MNIST_val_loader =  DataLoader(val_db, batch_size=batch_size, shuffle=True,  drop_last=False)
     Noisy_MNIST_test_loader  =  DataLoader(Noisy_MNIST_test , batch_size=batch_size, shuffle=False, drop_last=False)
     
-    return Noisy_MNIST_train_loader, Noisy_MNIST_val_loader, Noisy_MNIST_test_loader
+    # return Noisy_MNIST_train_loader, Noisy_MNIST_val_loader, Noisy_MNIST_test_loader
+    return Noisy_MNIST_train_loader, Noisy_MNIST_test_loader
 
 # %% test if the dataloaders work
 if __name__ == "__main__":
