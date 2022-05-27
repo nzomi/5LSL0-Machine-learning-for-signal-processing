@@ -5,6 +5,8 @@ import torch.nn as nn
 
 from main_template import load_model
 
+ex8 = True
+
 # %%  Encoder
 class Encoder(nn.Module):
     def __init__(self):
@@ -22,15 +24,28 @@ class Encoder(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(2)
         )
-        self.flatten1 = nn.Sequential(
+        if ex8 is False:
+            self.flatten1 = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(16*2*2,2)
-        )
-        self.flatten2 = nn.Sequential(
+            nn.Linear(16*2*2,2),
+            nn.ReLU()
+            )
+            self.flatten2 = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(16*2*2,2)
-        )
-
+            nn.Linear(16*2*2,2),
+            nn.ReLU()
+            )
+        else:
+            self.flatten1 = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(16*2*2,16),
+            nn.ReLU()
+            )
+            self.flatten2 = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(16*2*2,16),
+            nn.ReLU()
+            )
         self.n = torch.distributions.Normal(0,1)
         self.n.loc = self.n.loc.cuda()
         self.n.scale = self.n.scale.cuda()
@@ -46,7 +61,7 @@ class Encoder(nn.Module):
         miu = self.flatten1(x) # 64 --> 2
         sigma = torch.exp(self.flatten2(x)) # 64 --> 2
         h = miu + sigma * self.n.sample(miu.shape)
-        self.kl = 0.5 * (sigma**2 + miu**2 - torch.log(sigma) - 1).sum()
+        self.kl = 0.5 * (sigma + miu**2 - torch.log(sigma) - 1).sum()
         return miu, sigma, h
     
 # %%  Decoder
@@ -54,10 +69,16 @@ class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
         # create layers here
-        self.flatten = nn.Sequential(
+        if ex8 is False:
+            self.flatten = nn.Sequential(
             nn.Linear(2,16*2*2),
             nn.ReLU()
-        )
+            )
+        else:
+            self.flatten = nn.Sequential(
+            nn.Linear(16,16*2*2),
+            nn.ReLU()
+            )
         self.conv = nn.Sequential(
             nn.ConvTranspose2d(16,16,3,padding=1,bias=True),
             nn.BatchNorm2d(16),

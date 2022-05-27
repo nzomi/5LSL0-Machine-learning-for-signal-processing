@@ -164,9 +164,15 @@ def get_latent(x_clean, labels, model):
     return latent, labels
 
 #%%
-def scatter_plot(latent,label):
+def scatter_plot(model):
+    x_clean_test  = test_loader.dataset.Clean_Images
+    x_noisy_test  = test_loader.dataset.Noisy_Images
+    labels_test   = test_loader.dataset.Labels
+    latent, score= model(x_clean_test.cuda())
+    score = score.data.cpu().numpy()
+    latent = latent.data.cpu().numpy().reshape(-1,1,2,1)
     fig,ax = plt.subplots(figsize=(16,9))
-    scatter = ax.scatter(latent[:,0,0,0],latent[:,0,1,0],c=label)
+    scatter = ax.scatter(latent[:,0,0,0],latent[:,0,1,0],c=labels_test)
     legend = ax.legend(*scatter.legend_elements(),loc='upper right',title='digits')
     ax.add_artist(legend)
     plt.title('latent scatter')
