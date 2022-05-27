@@ -9,7 +9,7 @@ import numpy as np
 # local imports
 import MNIST_dataloader
 import VAE_template
-from main_template import load_model, loss_plot
+from main_template import load_model, loss_plot, scatter_plot
 
 # %% set torches random seed
 torch.random.manual_seed(0)
@@ -51,6 +51,7 @@ def train(model,optimizer,epochs,file_name):
             loss.backward()
             optimizer.step()
             loss_train += loss.item()
+            # print('train_kl',model.encoder.kl)
 
         model.eval()
         with torch.no_grad():
@@ -65,10 +66,10 @@ def train(model,optimizer,epochs,file_name):
                 loss_test += loss.item()
 
         if epoch%5 ==0:
-            print(f'train_loss = {loss_train/len(train_loader)}, test_loss = {loss_test/len(test_loader)}')
+            print(f'train_loss = {loss_train/len(train_loader)/1e4}, test_loss = {loss_test/len(test_loader)/1e4}')
 
-        train_loss.append(loss_train/len(train_loader))
-        test_loss.append(loss_test/len(test_loader))
+        train_loss.append(loss_train/len(train_loader)/1e4)
+        test_loss.append(loss_test/len(test_loader)/1e4)
         loss_train = 0.0
         loss_test = 0.0
 
@@ -130,12 +131,37 @@ def mnistgrid_plot(model):
     #plt.savefig("Fig/Exercise_7_grid.png", dpi=300, bbox_inches='tight')
     plt.show()
 
+#%%
+def denoise_plot(model):
+    examples = enumerate(test_loader)
+    _, (x_clean_example, x_noisy_example, labels_example) = next(examples)
 
+    latent, output = model(x_clean_example.cuda())
+    output = output.data.cpu().numpy()
+
+    plt.figure(figsize=(36,9))
+    for i in range(10):        
+        plt.subplot(4,10,i+1)
+        plt.imshow(x_noisy_example[i,0,:,:],cmap='gray')
+        plt.xticks([])
+        plt.yticks([])
+
+        plt.subplot(4,10,i+11)
+        plt.imshow(output[i,0,:,:],cmap='gray')
+        plt.xticks([])
+        plt.yticks([])
+
+        plt.subplot(4,10,i+21)
+        plt.imshow(x_clean_example[i,0,:,:],cmap='gray')
+        plt.xticks([])
+        plt.yticks([])
+
+    plt.savefig("Fig/Exercise_8_image.png", dpi=300, bbox_inches='tight')
+    plt.show()
+    
 # %%
 if __name__ == '__main__':
-    model, latent, score, train_loss, test_loss = train(model, optimizer, 10, 'VAE_')
-    # model = load_model('VAE_50.pth')
-    loss_plot(train_loss,test_loss)
-    image_plot(model)
-    mnistgrid_plot(model)
+    model, latent, score, train_loss, test_loss = train(model, optimizer, 50, 'VAE_ex8_')
+
+
 # %%

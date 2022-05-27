@@ -131,6 +131,7 @@ def sanity_check():
     print('Encoder',sigma.shape) 
     print('Encoder',h.shape) 
     print('Decoder',out.shape)
+    print('VAE',latent.shape)
     print('VAE',r.shape)
 
 # %%

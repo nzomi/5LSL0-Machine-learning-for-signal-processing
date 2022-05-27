@@ -150,13 +150,6 @@ def load_model(filename):
     return model
 
 #%%
-def dataloader_type_change(model,dataloader):
-    x_clean, x_noisy, labels = test_model(model,dataloader)
-    x_clean = torch.cat(x_clean, dim = 0)
-    x_noisy= torch.cat(x_noisy, dim = 0)
-    labels = torch.cat(labels, dim = 0)
-    return x_clean, x_noisy, labels
-
 def get_latent(x_clean, labels, model):
     latent, score = model(x_clean)
     latent = latent.data.cpu().numpy()

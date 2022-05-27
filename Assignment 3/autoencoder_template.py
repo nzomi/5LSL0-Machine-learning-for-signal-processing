@@ -100,8 +100,7 @@ class Classifier(nn.Module):
         )
         self.flatten = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(2*2*16,10),
-            nn.LogSoftmax(dim=1)
+            nn.Linear(2*2*16,10)
         )
         
     def forward(self, x):
